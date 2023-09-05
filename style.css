@@ -1,16 +1,100 @@
+:root {
+  font-family: serif;
+  font-size: min(1vw, 1vh);
+}
+
 body {
   margin: 0;
   padding: 0;
-  font-family: serif;
-  font-size: calc((1vw + 1vh) / 2);
   background: #654;
   color: #FFF;
 }
 
 h1 {
-  font-size: 150%;
+  font-size: 3em;
 }
 
 #src path {
   fill: url(#t1);
+}
+
+.coin {
+  display: inline-block;
+  width: var(--size);
+  height: var(--size);
+  position: relative;
+  margin: 2em;
+}
+
+.coin i {
+  display: block;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  background: red var(--bg0);
+  background-position: var(--bgX) var(--bgY);
+  background-size: 80em 80em;
+  border-radius: 50%;
+}
+
+.coin b {
+  display: block;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: .3em;
+  top: .8em;
+  background: #320;
+  border-radius: 50%;
+  box-shadow: .3em .3em .5em .2em rgba(0,0,0,.9);
+}
+
+.coin.pop {
+  --size: 26.6em;
+  --bgX: 0%;
+  --bgY: 0%;
+}
+.coin.kin {
+  --size: 25.2em;
+  --bgX: 50%;
+  --bgY: -.666em;
+}
+.coin.bis {
+  --size: 23.8em;
+  --bgX: -54.8em;
+  --bgY: -1.333em;
+}
+
+.coin.nob {
+  --size: 22.4em;
+  --bgX: -2.1em;
+  --bgY: 50%;
+}
+.coin.pri {
+  --size: 21.0em;
+  --bgX: 50%;
+  --bgY: 50%;
+}
+.coin.kni {
+  --size: 19.6em;
+  --bgX: 23.2em;
+  --bgY: 50%;
+}
+
+.coin.bou {
+  --size: 18.2em;
+  --bgX: -4.2em;
+  --bgY: -57.5em;
+}
+.coin.ser {
+  --size: 16.8em;
+  --bgX: 50%;
+  --bgY: -58.2em;
+}
+.coin.pea {
+  --size: 15.4em;
+  --bgX: -58.9em;
+  --bgY: -58.9em;
 }
