@@ -1,5 +1,5 @@
 console.log(`
-Rules:
+Roles:
 
 Pope https://en.wikipedia.org/wiki/Papal_regalia_and_insignia (Saint Peter's Keys)
 King https://commons.wikimedia.org/wiki/File:Picture_of_Queen_Ediva_in_Canterbury_Cathedral_(detail).png
@@ -14,31 +14,104 @@ Servant
 Peasant
 `)
 
-const { PI, sin, cos, pow, random } = Math
+const doc = document
+const body = doc.body
+const hiGraphics = !doc.location.search.match(/[?&]low(=|$)/)
+const start = Date.now()
+const { PI, sin, cos, abs, pow, random } = Math
 const turn = 2*PI
-const rnd = (mult=1)=> random() * mult
 const coinBGs = []
+const $ = (sel)=> doc.querySelector(sel)
+const pieceNames = {
+  pop: 'Pope',
+  kin: 'King',
+  bis: 'Bishop',
+  nob: 'Noble',
+  pri: 'Priest',
+  kni: 'Knight',
+  bou: 'Bourgeois',
+  ser: 'Servant',
+  pea: 'Peasant',
+}
+const pieces = [ [], [] ]
 
-fetch('pieces.3.svg')
-.then(res => res.text())
-.then(code => {
-  document.querySelector('#src').innerHTML += code //.replace(/style="/g, `style="stroke-width:3;`)
-})
+function mkEl(tag, attrs, parent) {
+  const NS = tag==='svg' ? 'http://www.w3.org/2000/svg' : 'http://www.w3.org/1999/xhtml'
+  const el = doc.createElementNS(NS, tag)
+  Object.entries(attrs).forEach(([att, val]) => el.setAttribute(att, val))
+  if (parent) parent.appendChild(el)
+  return el
+}
 
-const ctx = c.getContext('2d')
+const canvas = mkEl('canvas', { width: 2400, height: 2400 })
+const ctx = canvas.getContext('2d')
 
-const img = new Image()
-img.onload = init
-img.onerror = initError
-img.src = "pieces.4.svg"
+// Pseudo random:
+const pRnd = (index, mult=1)=> abs((sin(index+start) * 7919.953) % 1) * mult
+
+const svgToDataURL = (id)=>
+    'data:image/svg+xml,' +
+    $(id).outerHTML
+    .replace(/\s+/g, '%20')
+    .replace(/#/g, '%23')
+
+console.log('Loading SVGs...')
+
+const imgCoinBW = new Image()
+const imgCoinGray = new Image()
+
+imgCoinBW.onload = loadCoinGray
+imgCoinBW.onerror = initError
+imgCoinBW.src = svgToDataURL('#pieces-3')
+
+function loadCoinGray() {
+  imgCoinGray.onload = init
+  imgCoinGray.onerror = initError
+  imgCoinGray.src = svgToDataURL('#pieces-4')
+}
 
 const getPos = (x, y)=> (1200*y + x) * 4
 
 async function init() {
-  console.log('INIT')
+  try {
+    console.log(`INIT Graphics ${hiGraphics ? 'High' : 'Low'}`, new Date(start))
+    await mkCoinIcons()
+    await mkCoinTextures()
+    createPieces()
+    console.log(`Builded! ${((Date.now()-start)/1000).toFixed(2)} secs.`)
+  } catch(err) {
+    console.log('Fail to build game assets.', err)
+    alert(`Fail to build game assets.\n\n${err.message}\n\nTry to reload.`)
+  }
+}
 
+async function mkCoinIcons() {
+  ctx.fillStyle = '#FFF'
+  ctx.fillRect(0, 0, 2400, 2400)
+  ctx.drawImage(imgCoinBW, 0, 0, 2400, 2400)
+
+  // Convert light to mask
+  const data = ctx.getImageData(0, 0, 2400, 2400).data
+  data.forEach((val, i)=> {
+    if (i%4===0) {
+      data[i] = data[i+1] = data[i+2] = 255
+      data[i+3] = 255-val
+    }
+  })
+
+  // Apply bg data to canvas:
+  ctx.putImageData(new ImageData(data, 2400, 2400), 0, 0)
+
+  // Create CSS var with icons bg:
+  const url = await new Promise(resolve =>
+    canvas.toBlob(blob=> resolve(URL.createObjectURL(blob)))
+  )
+  body.style.setProperty('--bgBW', `url(${url})`)
+}
+
+async function mkCoinTextures() {
+  canvas.width = canvas.height = 1200
   for (let lightRevX=0; lightRevX<=1; lightRevX++) {
-
     // Draw coin dots:
     drawCoinDots()
     const coinDotsPix = emboss(ctx.getImageData(0, 0, 1200, 1200).data, lightRevX)
@@ -46,33 +119,38 @@ async function init() {
     // Draw coin symbols:
     ctx.fillStyle = '#FFF'
     ctx.fillRect(0, 0, 1200, 1200)
-    ctx.drawImage(img, 0, 0, 1200, 1200)
+    ctx.drawImage(imgCoinGray, 0, 0, 1200, 1200)
     const newPix = emboss(ctx.getImageData(0, 0, 1200, 1200).data, lightRevX)
-    // Make some icons more legible:
-    contrast(newPix, 0, 0, 400, 400, 1.5) // Pope keys
-    contrast(newPix, 400, 0, 800, 400, 1.2) // King and Bishop
-    contrast(newPix, 0, 400, 400, 800, 1.8) // the two persons
-    contrast(newPix, 400, 400, 400, 400, 1.5) // the priest cross
-    contrast(newPix, 400, 800, 800, 400, 1.333) // the two lasts
+    if (hiGraphics) {
+      // Make some icons more legible:
+      contrast(newPix, 0, 0, 400, 400, 1.5) // Pope keys
+      contrast(newPix, 400, 0, 800, 400, 1.2) // King and Bishop
+      contrast(newPix, 0, 400, 400, 800, 1.8) // the two persons
+      contrast(newPix, 400, 400, 400, 400, 1.5) // the Priest cross
+      contrast(newPix, 800, 400, 400, 400, 1.25) // the Horse
+      contrast(newPix, 400, 800, 800, 400, 1.333) // the two lasts
 
-    // Apply coin dots over coin symbols:
-    coinDotsPix.forEach((val, i)=> {
-      if (val !== 127) newPix[i] = val
-    })
+      // Apply coin dots over coin symbols:
+      coinDotsPix.forEach((val, i)=> {
+        if (val !== 127) newPix[i] = val
+      })
 
-    // Apply gold texture
-    for (let i=0; i<newPix.length; i+=4) {
-      let r = newPix[i+0] / 255
-      let g = newPix[i+1] / 255
-      let b = newPix[i+2] / 255
-      if (rnd() < .2) {
-        newPix[i+0] = 50 + 155*r + rnd(50)
-        newPix[i+1] = newPix[i+0] * (g<.7 ? .6+rnd(.3) : 1)
-        newPix[i+2] = rnd(100) * b
-      } else {
-        newPix[i+0] = 50 + 190*r
-        newPix[i+1] = 220*g
-        newPix[i+2] = 200*pow(b, 4)
+      // Apply gold texture
+      for (let idx=0; idx<newPix.length; idx+=4) {
+        let r = newPix[idx+0] / 255
+        let g = newPix[idx+1] / 255
+        let b = newPix[idx+2] / 255
+        newPix[idx+0] = 50 + 180*r
+        newPix[idx+1] = 220*g
+        newPix[idx+2] = 200*pow(b, 4)
+        let i = ~~(idx/5)
+        if (pRnd(i) < .2) {
+          newPix[idx+0] = 55 + 140*r + pRnd(i+1,60)
+          newPix[idx+1] = newPix[idx] * (
+            g>.6 ? 1 : .6 + pow(pRnd(i+3,.4), 1.5)
+          )
+          newPix[idx+2] = pRnd(i+4,100) * b
+        }
       }
     }
 
@@ -84,17 +162,14 @@ async function init() {
 
     // Save background
     await new Promise(resolve =>
-      c.toBlob(blob=> {
+      canvas.toBlob(blob=> {
         coinBGs.push(URL.createObjectURL(blob))
         resolve()
       })
     )
   }
   coinBGs.forEach((url, i)=> {
-    document.body.style.setProperty('--bg'+i, `url(${url})`)
-    const img = new Image()
-    img.src = url
-    document.body.appendChild(img)
+    body.style.setProperty('--bg'+i, `url(${url})`)
   })
 }
 
@@ -152,5 +227,39 @@ function contrast(data, xLeft, yTop, w, h, mult) {
     let i = getPos(x, y)
     data[i+0] = data[i+1] = data[i+2] = data[i]*mult + 127*(1-mult)
     //data[i+0] = 127*mult
+  }
+}
+
+function createPieces() {
+  Object.entries(pieceNames).forEach(([code, name], i) => {
+    console.log('Building '+name)
+    // <div class="coin pop"><b></b><i></i></div>
+    const el = mkEl('div', { class: 'coin '+code }, board)
+    mkEl('b', {}, el)
+    mkEl('i', {}, el)
+    el.player = 0
+    el.roleIdx = i
+    pieces[el.player][el.roleIdx] = el
+    el.addEventListener('mouseenter', ()=> mouseIn(el))
+    el.addEventListener('mouseleave', ()=> mouseOut(el))
+    setTimeout(()=> el.classList.add('created'), 500+1000*i)
+  })
+}
+
+function mouseIn(coin) {
+  for (let i=-1; i<=2; i++) {
+    let neighbor = pieces[coin.player][coin.roleIdx+i]
+    if (i!==0 && neighbor && !neighbor.placed) {
+      neighbor.classList.add(`mv-${i<0 ? 'left' : 'right'}-${abs(i)}`)
+    }
+  }
+}
+
+function mouseOut(coin) {
+  for (let i=-2; i<=2; i++) {
+    let neighbor = pieces[coin.player][coin.roleIdx+i]
+    if (i!==0 && neighbor) {
+      neighbor.classList.remove('mv-left-1', 'mv-right-1', 'mv-right-2')
+    }
   }
 }
