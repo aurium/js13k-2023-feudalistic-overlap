@@ -14,7 +14,7 @@ while read line; do
   if (echo "$line" | grep -q '<link rel="stylesheet".*'); then
     echo ">> Building CSS..." >&2
     echo '<style>'
-    sass --style compressed style.scss
+    sass --style compressed style/index.scss
     echo '</style>'
   elif (echo "$line" | grep -q '<script.*</script>'); then
     echo ">> Building JS..." >&2

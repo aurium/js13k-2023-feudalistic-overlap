@@ -111,7 +111,7 @@ async function mkCoinIcons() {
 
 async function mkCoinTextures() {
   canvas.width = canvas.height = 1200
-  for (let lightRevX=0; lightRevX<=1; lightRevX++) {
+  for (let player=0; player<2; player++) for (let lightRevX=0; lightRevX<2; lightRevX++) {
     // Draw coin dots:
     drawCoinDots()
     const coinDotsPix = emboss(ctx.getImageData(0, 0, 1200, 1200).data, lightRevX)
@@ -151,13 +151,14 @@ async function mkCoinTextures() {
           )
           newPix[idx+2] = pRnd(i+4,100) * b
         }
+        if (player) newPix[idx] = newPix[idx+1] = newPix[idx+2] = newPix[idx] * .8
       }
     }
 
     // Apply bg data to canvas:
     ctx.putImageData(new ImageData(newPix, 1200, 1200), 0, 0)
     // Clear the top line, resulting of emboss out of limits:
-    ctx.fillStyle = '#916e0c'
+    ctx.fillStyle = player ? '#777' : '#916e0c'
     ctx.fillRect(0,0,1200,2)
 
     // Save background
@@ -231,26 +232,30 @@ function contrast(data, xLeft, yTop, w, h, mult) {
 }
 
 function createPieces() {
-  Object.entries(pieceNames).forEach(([code, name], i) => {
-    console.log('Building '+name)
-    // <div class="coin pop"><b></b><i></i></div>
-    const el = mkEl('div', { class: 'coin '+code }, board)
-    mkEl('b', {}, el)
-    mkEl('i', {}, el)
-    el.player = 0
-    el.roleIdx = i
-    pieces[el.player][el.roleIdx] = el
-    el.addEventListener('mouseenter', ()=> mouseIn(el))
-    el.addEventListener('mouseleave', ()=> mouseOut(el))
-    setTimeout(()=> el.classList.add('created'), 500+1000*i)
-  })
+  for (let player=0; player<2; player++) {
+    Object.entries(pieceNames).forEach(([code, name], i) => {
+      console.log('Building '+name)
+      // <div class="coin pop"><b></b><i></i></div>
+      const el = mkEl('div', { class: `coin ${code} player-${player}` }, board)
+      mkEl('b', {}, el)
+      mkEl('i', {}, el)
+      el.player = player
+      el.roleIdx = i
+      pieces[player][i] = el
+      el.style.setProperty('--idx', i)
+      el.style.setProperty('--pos', 1 - pow( 1 - i/8, 1.1))
+      el.addEventListener('mouseenter', ()=> mouseIn(el))
+      el.addEventListener('mouseleave', ()=> mouseOut(el))
+      setTimeout(()=> el.classList.add('created'), 500+1000*i)
+    })
+  }
 }
 
 function mouseIn(coin) {
   for (let i=-1; i<=2; i++) {
     let neighbor = pieces[coin.player][coin.roleIdx+i]
     if (i!==0 && neighbor && !neighbor.placed) {
-      neighbor.classList.add(`mv-${i<0 ? 'left' : 'right'}-${abs(i)}`)
+      neighbor.classList.add(`mv-${i<0 ? 'pre' : 'pos'}-${abs(i)}`)
     }
   }
 }
@@ -259,7 +264,7 @@ function mouseOut(coin) {
   for (let i=-2; i<=2; i++) {
     let neighbor = pieces[coin.player][coin.roleIdx+i]
     if (i!==0 && neighbor) {
-      neighbor.classList.remove('mv-left-1', 'mv-right-1', 'mv-right-2')
+      neighbor.classList.remove('mv-pre-1', 'mv-pos-1', 'mv-pos-2')
     }
   }
 }

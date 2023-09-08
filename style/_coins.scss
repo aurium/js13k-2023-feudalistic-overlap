@@ -1,0 +1,178 @@
+@use "sass:math";
+
+.coin {
+  &.player-0 { --p: 1 }  // First player positioning multiplyer.
+  &.player-1 { --p: -1 } // Second player positioning multiplyer.
+
+  position: absolute;
+  display: inline-block;
+  width: var(--size);
+  height: var(--size);
+  margin: 0 0 0 -2em;
+  cursor: grab;
+  transition: 1.5s ease-out;
+  transform: translate(0, 0) rotate(calc(var(--p)*450deg));
+
+  @media (orientation: portrait) {
+    top: calc(50dvh - var(--p)*10em);
+    left: 105vw;
+  }
+  @media (orientation: landscape) {
+    left: calc(40vw - var(--p)*10em);
+    top: 102dvh;
+  }
+
+  &.created {
+    transform: rotate(0);
+    &.mv-pre-1, &.mv-pos-1, &.mv-pos-2 {
+      transition: .5s ease-out;
+    }
+    @media (orientation: portrait) {
+      transform: translateY(calc(var(--p)*-2dvh));
+      &.player-0 { top: calc(13em + 5em * var(--pos)) }
+      &.player-1 { top: calc(100dvh - 34em + 5em * var(--pos)) }
+      left: calc( 3vw + 82vw * var(--pos) );
+      &.mv-pre-1 { transform: translate(-3vw, calc(var(--p)*-3dvh)) rotate(-15deg) }
+      &.mv-pos-1 { transform: translate(8vw,  calc(var(--p)*-4dvh)) rotate(30deg) }
+      &.mv-pos-2 { transform: translate(3vw,  calc(var(--p)*-2dvh)) rotate(15deg) }
+    }
+    @media (orientation: landscape) {
+      &.player-0 { left: calc(7em + 5em * var(--pos)) }
+      &.player-1 { left: calc(100vw - 30em + 5em * var(--pos)) }
+      top: calc( 1dvh + 81dvh * var(--pos) );
+      transform: translateX(calc(var(--p)*-2vw)) rotate(calc(var(--p)*-10deg));
+      &.mv-pre-1 { transform: translate(calc(var(--p)*-3vw), -3dvh) rotate(calc(var(--p)*-20deg)) }
+      &.mv-pos-1 { transform: translate(calc(var(--p)*-3vw), 8dvh)  rotate(calc(var(--p)*-30deg)) }
+      &.mv-pos-2 { transform: translate(calc(var(--p)*-2vw), 4dvh)  rotate(calc(var(--p)*-20deg)) }
+    }
+    &:hover {
+      transform: none;
+      transition: .5s ease-out;
+    }
+  }
+}
+
+.coin i {
+  display: block;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  background: var(--bg0);
+  background-position: var(--bgX) var(--bgY);
+  background-size: 80em 80em;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+.coin i::before {
+  content: "";
+  display: block;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  background: inherit;
+  background-image: var(--bg1);
+  opacity: 0;
+  transition: .8s linear;
+}
+
+.coin.player-1 i {
+  background-image: var(--bg2);
+  &::before { background-image: var(--bg3) }
+}
+
+.coin:hover i::before {
+  opacity: 1;
+  transition: .4s linear;
+}
+
+.coin i::after {
+  content: "";
+  display: block;
+  position: absolute;
+  width: 300%;
+  height: 100%;
+  left: -300%;
+  top: 0;
+  background: linear-gradient(45deg, #444 33%, #FFF 50%, #FFF, transparent 70%);
+  opacity: .9;
+  mix-blend-mode: overlay;
+  transition: .8s ease-out;
+}
+.coin:hover i::after {
+  left: -50%;
+  transition: .4s ease-out;
+}
+
+/* * * Coin Role Textures * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+.coin.pop {
+  --size: 26.6em;
+  --bgX: 0%;
+  --bgY: 0%;
+}
+.coin.kin {
+  --size: 25.2em;
+  --bgX: 50%;
+  --bgY: -.666em;
+}
+.coin.bis {
+  --size: 23.8em;
+  --bgX: -54.8em;
+  --bgY: -1.333em;
+}
+
+.coin.nob {
+  --size: 22.4em;
+  --bgX: -2.1em;
+  --bgY: 50%;
+}
+.coin.pri {
+  --size: 21.0em;
+  --bgX: 50%;
+  --bgY: 50%;
+}
+.coin.kni {
+  --size: 19.6em;
+  --bgX: 23.2em;
+  --bgY: 50%;
+}
+
+.coin.bou {
+  --size: 18.2em;
+  --bgX: -4.2em;
+  --bgY: -57.5em;
+}
+.coin.ser {
+  --size: 16.8em;
+  --bgX: 50%;
+  --bgY: -58.2em;
+}
+.coin.pea {
+  --size: 15.4em;
+  --bgX: -58.9em;
+  --bgY: -58.9em;
+}
+
+/* * * Coin Shadow * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
+.coin b {
+  display: block;
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+  background: #320;
+  border-radius: 50%;
+  box-shadow:
+    .3em .3em .5em .2em rgba(0,0,0,.9),
+    0em 0em 1.5em .5em rgba(0,0,0,.8);
+  transform: rotate(calc(var(--p)*-450deg)) translate(.3em, .8em);
+  transition: 1.5s ease-out;
+}
+.coin.created b { transform: rotate(0) translate(.3em, .8em) }

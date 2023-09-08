@@ -1,0 +1,61 @@
+:root {
+  font-family: serif;
+  font-size: min(1vw, 1dvh);
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #654;
+  color: #FFF;
+  overflow: hidden;
+  background: #730;
+  background-image:
+    radial-gradient(at 15% 25%,
+      #420 00%, transparent 01%,
+      #420 05%, transparent 05.1%,
+      #420 10%, transparent 10.1%,
+      #420 15%, transparent 15.1%,
+      #420 20%, transparent 20.1%,
+      #420 25%, transparent 25.1%
+    ),
+    radial-gradient(at -5% 78%,
+      #420 00%, transparent 01%,
+      #420 05%, transparent 05.1%,
+      #420 10%, transparent 10.1%,
+      #420 15%, transparent 15.1%,
+      #420 20%, transparent 20.1%,
+      #420 25%, transparent 25.1%
+    );
+  background-size: 650vw 50dvh;
+  @media (orientation: landscape) {
+    background-size: 650vw 75dvh;
+  }
+  // Why dvh? https://stackoverflow.com/questions/37112218/css3-100vh-not-constant-in-mobile-browser#answer-72245072
+}
+
+#board {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+h1 {
+  text-align: center;
+  font-size: 7em;
+  line-height: 2em;
+  margin: -0.25em;
+  text-shadow:
+    -0.03em -0.03em .04em rgba(0,0,0,.5),
+    .03em .03em .04em rgba(255,255,255,.9);
+  letter-spacing: .03em;
+  color: rgba(0,0,0,.1);
+  background: #7f7f7f;
+  mix-blend-mode: overlay;
+}
+
+#pieces-3, #pieces-4 {
+  display: none;
+}
