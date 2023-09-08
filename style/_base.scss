@@ -42,8 +42,56 @@ body {
   right: 0;
 }
 
-h1 {
-  display: none;
+header {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 9;
+  filter:
+    drop-shadow(-.3em 1em .6em rgba(0,0,0,.8))
+    drop-shadow(1em 1em 2em rgba(0,0,0,.8));
+
+  div {
+    font-size: 3px;
+    transform: scale(var(--em));
+    padding: 1px 0 0 9px;
+    box-sizing: border-box;
+    width: 60px;
+    height: 80px;
+    margin: -20px -30px;
+    background: linear-gradient(#666, #BBB 2%, #EEE 5%, #888 40%, #888 60%, #EEE);
+    clip-path: path("M 0 0 L 50 0 C 70 10 40 65 60 75 L 10 75 C -10 65 20 10 0 0");
+    color: rgba(0,0,0,.6);
+
+    &::after {
+      content: "XIII";
+      position: absolute;
+      display: block;
+      top: 67px;
+      left: 41px;
+      color: #B00;
+      font-weight: bold;
+      transform: skewX(21deg);
+    }
+
+    h1 {
+      margin: 1em .35em;
+      font-size: 1.25em;
+      transform: skewX(12deg);
+      color: #944;
+    }
+
+    p {
+      margin-left: 2.5px;
+    }
+
+    pre {
+      padding-top: 1em;
+      font-family: inherit;
+      transform: skewX(-8deg);
+      height: 38px;
+    }
+  }
 }
 
 #pieces-3, #pieces-4 {

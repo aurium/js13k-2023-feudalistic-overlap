@@ -18,7 +18,7 @@ const doc = document
 const body = doc.body
 const hiGraphics = !doc.location.search.match(/[?&]low(=|$)/)
 const start = Date.now()
-const { PI, sin, cos, abs, pow, random } = Math
+const { PI, sin, cos, abs, min, pow, random } = Math
 const turn = 2*PI
 const coinBGs = []
 const $ = (sel)=> doc.querySelector(sel)
@@ -34,6 +34,24 @@ const pieceNames = {
   pea: 'Peasant',
 }
 const pieces = [ [], [] ]
+
+const startMsg = [
+  'Peasants are in the bottom,',
+  'bellow of Servants,',
+  'then Bourgeois and Knights,',
+  'then Priests and Nobles,',
+  'then Bishops and Kings,',
+  'all bellow of the Pope.',
+  '\nYes, this is improved',
+  '            Tic-Tac-Toe.'
+]
+async function writeStartLine(delay) {
+  console.log('Writing start line at', Date.now()%60_000/1000)
+  $('header pre').innerHTML += startMsg.shift() + '\n'
+  return new Promise(res => setTimeout(res, delay))
+}
+
+body.style.setProperty('--em', min(window.screen.height, window.screen.width)/100)
 
 function mkEl(tag, attrs, parent) {
   const NS = tag==='svg' ? 'http://www.w3.org/2000/svg' : 'http://www.w3.org/1999/xhtml'
@@ -57,25 +75,25 @@ const svgToDataURL = (id)=>
 
 console.log('Loading SVGs...')
 
-const imgCoinBW = new Image()
+//const imgCoinBW = new Image()
 const imgCoinGray = new Image()
 
-imgCoinBW.onload = loadCoinGray
-imgCoinBW.onerror = initError
-imgCoinBW.src = svgToDataURL('#pieces-3')
+// imgCoinBW.onload = loadCoinGray
+// imgCoinBW.onerror = initError
+// imgCoinBW.src = svgToDataURL('#pieces-3')
 
-function loadCoinGray() {
+// function loadCoinGray() {
   imgCoinGray.onload = init
   imgCoinGray.onerror = initError
   imgCoinGray.src = svgToDataURL('#pieces-4')
-}
+// }
 
 const getPos = (x, y)=> (1200*y + x) * 4
 
 async function init() {
   try {
     console.log(`INIT Graphics ${hiGraphics ? 'High' : 'Low'}`, new Date(start))
-    await mkCoinIcons()
+    //await mkCoinIcons()
     await mkCoinTextures()
     createPieces()
     console.log(`Builded! ${((Date.now()-start)/1000).toFixed(2)} secs.`)
@@ -85,33 +103,34 @@ async function init() {
   }
 }
 
-async function mkCoinIcons() {
-  ctx.fillStyle = '#FFF'
-  ctx.fillRect(0, 0, 2400, 2400)
-  ctx.drawImage(imgCoinBW, 0, 0, 2400, 2400)
-
-  // Convert light to mask
-  const data = ctx.getImageData(0, 0, 2400, 2400).data
-  data.forEach((val, i)=> {
-    if (i%4===0) {
-      data[i] = data[i+1] = data[i+2] = 255
-      data[i+3] = 255-val
-    }
-  })
-
-  // Apply bg data to canvas:
-  ctx.putImageData(new ImageData(data, 2400, 2400), 0, 0)
-
-  // Create CSS var with icons bg:
-  const url = await new Promise(resolve =>
-    canvas.toBlob(blob=> resolve(URL.createObjectURL(blob)))
-  )
-  body.style.setProperty('--bgBW', `url(${url})`)
-}
+// async function mkCoinIcons() {
+//   ctx.fillStyle = '#FFF'
+//   ctx.fillRect(0, 0, 2400, 2400)
+//   ctx.drawImage(imgCoinBW, 0, 0, 2400, 2400)
+//
+//   // Convert light to mask
+//   const data = ctx.getImageData(0, 0, 2400, 2400).data
+//   data.forEach((val, i)=> {
+//     if (i%4===0) {
+//       data[i] = data[i+1] = data[i+2] = 255
+//       data[i+3] = 255-val
+//     }
+//   })
+//
+//   // Apply bg data to canvas:
+//   ctx.putImageData(new ImageData(data, 2400, 2400), 0, 0)
+//
+//   // Create CSS var with icons bg:
+//   const url = await new Promise(resolve =>
+//     canvas.toBlob(blob=> resolve(URL.createObjectURL(blob)))
+//   )
+//   body.style.setProperty('--bgBW', `url(${url})`)
+// }
 
 async function mkCoinTextures() {
   canvas.width = canvas.height = 1200
   for (let player=0; player<2; player++) for (let lightRevX=0; lightRevX<2; lightRevX++) {
+
     // Draw coin dots:
     drawCoinDots()
     const coinDotsPix = emboss(ctx.getImageData(0, 0, 1200, 1200).data, lightRevX)
@@ -121,6 +140,7 @@ async function mkCoinTextures() {
     ctx.fillRect(0, 0, 1200, 1200)
     ctx.drawImage(imgCoinGray, 0, 0, 1200, 1200)
     const newPix = emboss(ctx.getImageData(0, 0, 1200, 1200).data, lightRevX)
+    await writeStartLine(100)
     if (hiGraphics) {
       // Make some icons more legible:
       contrast(newPix, 0, 0, 400, 400, 1.5) // Pope keys
@@ -168,6 +188,7 @@ async function mkCoinTextures() {
         resolve()
       })
     )
+    await writeStartLine(1)
   }
   coinBGs.forEach((url, i)=> {
     body.style.setProperty('--bg'+i, `url(${url})`)

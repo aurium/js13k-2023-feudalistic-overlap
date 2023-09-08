@@ -23,7 +23,7 @@ while read line; do
     echo '</script>'
   elif (echo "$line" | grep -q '</body>'); then
     echo ">> Embedding SVG..." >&2
-    ./minify-svg pieces.3.svg
+    #./minify-svg pieces.3.svg
     ./minify-svg pieces.4.svg
     echo '</body>'
   else
