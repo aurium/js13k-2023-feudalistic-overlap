@@ -34,7 +34,7 @@ body {
   // Why dvh? https://stackoverflow.com/questions/37112218/css3-100vh-not-constant-in-mobile-browser#answer-72245072
 }
 
-#board {
+#table {
   position: absolute;
   top: 0;
   bottom: 0;
@@ -43,17 +43,7 @@ body {
 }
 
 h1 {
-  text-align: center;
-  font-size: 7em;
-  line-height: 2em;
-  margin: -0.25em;
-  text-shadow:
-    -0.03em -0.03em .04em rgba(0,0,0,.5),
-    .03em .03em .04em rgba(255,255,255,.9);
-  letter-spacing: .03em;
-  color: rgba(0,0,0,.1);
-  background: #7f7f7f;
-  mix-blend-mode: overlay;
+  display: none;
 }
 
 #pieces-3, #pieces-4 {

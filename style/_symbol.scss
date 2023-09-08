@@ -19,41 +19,41 @@
     transition: 2s ease-out;
   }
 
-  &.created::after {
-    animation: 3s linear coin-init;
-  }
+  // &.created::after {
+  //   animation: 3s linear coin-init;
+  // }
   &:hover::after {
     animation: 2s linear coin-placed;
   }
 
-  @media (orientation: portrait) {
-    --cit: translate(
-      calc( (var(--idx) - 4) * -10vw ),
-      calc( var(--p) * 30dvh )
-    );
-  }
-  @media (orientation: landscape) {
-    --cit: translate(
-      calc( var(--p) * 30vw ),
-      calc( (var(--idx) - 4) * -10dvh )
-    ) rotate(calc( var(--p) * 12deg ));
-  }
+//   @media (orientation: portrait) {
+//     --cit: translate(
+//       calc( (var(--idx) - 4) * -10vw ),
+//       calc( var(--p) * 30dvh )
+//     );
+//   }
+//   @media (orientation: landscape) {
+//     --cit: translate(
+//       calc( var(--p) * 30vw ),
+//       calc( (var(--idx) - 4) * -10dvh )
+//     ) rotate(calc( var(--p) * 12deg ));
+//   }
 }
 
-@keyframes coin-init {
-  45% {
-    opacity: 0;
-    transform: var(--cit) scale(8);
-  }
-  70% {
-    opacity: .8;
-    transform: scale(1);
-  }
-  100% {
-    opacity: 0;
-    transform: scale(1);
-  }
-}
+// @keyframes coin-init {
+//   45% {
+//     opacity: 0;
+//     transform: var(--cit) scale(8);
+//   }
+//   70% {
+//     opacity: .8;
+//     transform: scale(1);
+//   }
+//   100% {
+//     opacity: 0;
+//     transform: scale(1);
+//   }
+// }
 
 @keyframes coin-placed {
   0% {

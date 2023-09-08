@@ -4,6 +4,7 @@
   &.player-0 { --p: 1 }  // First player positioning multiplyer.
   &.player-1 { --p: -1 } // Second player positioning multiplyer.
 
+  pointer-events: none;
   position: absolute;
   display: inline-block;
   width: var(--size);

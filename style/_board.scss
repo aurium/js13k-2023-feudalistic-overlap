@@ -1,0 +1,27 @@
+#board {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 92em;
+  height: 92em;
+  transform: translate(-46em, -46em); // rotate(45deg);
+  background: #7f7f7f;
+  mix-blend-mode: overlay;
+
+  u {
+    top: calc( 31em * var(--l) );
+    left: 0;
+    &, &::before, &::after {
+      content: "";
+      position: absolute;
+      width: 30em;
+      height: 30em;
+      border-radius: 8em;
+      background: #666;
+      box-shadow: inset .5em .5em 1em rgba(0,0,0,.666), inset -.5em -.5em 1em #FFF;
+      opacity: .8;
+    }
+    &::before { left: 31em }
+    &::after { left: 62em }
+  }
+}

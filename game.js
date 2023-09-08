@@ -236,7 +236,7 @@ function createPieces() {
     Object.entries(pieceNames).forEach(([code, name], i) => {
       console.log('Building '+name)
       // <div class="coin pop"><b></b><i></i></div>
-      const el = mkEl('div', { class: `coin ${code} player-${player}` }, board)
+      const el = mkEl('div', { class: `coin ${code} player-${player}` }, table)
       mkEl('b', {}, el)
       mkEl('i', {}, el)
       el.player = player
@@ -247,6 +247,7 @@ function createPieces() {
       el.addEventListener('mouseenter', ()=> mouseIn(el))
       el.addEventListener('mouseleave', ()=> mouseOut(el))
       setTimeout(()=> el.classList.add('created'), 500+1000*i)
+      setTimeout(()=> el.style.pointerEvents = 'all', 2000+1000*i)
     })
   }
 }
