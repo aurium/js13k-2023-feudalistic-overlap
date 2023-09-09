@@ -30,8 +30,8 @@
     }
     @media (orientation: portrait) {
       transform: translateY(calc(var(--p)*-2dvh));
-      &.player-0 { top: calc(13em + 5em * var(--pos)) }
-      &.player-1 { top: calc(100dvh - 34em + 5em * var(--pos)) }
+      &.player-0 { top: calc(9em + 5em * var(--pos)) }
+      &.player-1 { top: calc(100dvh - 36.5em + 5em * var(--pos)) }
       left: calc( 3vw + 82vw * var(--pos) );
       &.mv-pre-1 { transform: translate(-3vw, calc(var(--p)*-3dvh)) rotate(-15deg) }
       &.mv-pos-1 { transform: translate(8vw,  calc(var(--p)*-4dvh)) rotate(30deg) }

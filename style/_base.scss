@@ -51,6 +51,17 @@ header {
     drop-shadow(-.3em 1em .6em rgba(0,0,0,.8))
     drop-shadow(1em 1em 2em rgba(0,0,0,.8));
 
+  &.hide {
+    transform: translateY(-150em) scale(1);
+    animation: 1.5s ease-in hide-header;
+  }
+
+  @keyframes hide-header {
+    0% { transform: translateY(0) scale(1) }
+    40% { transform: translateY(-20em) scale(1, 1.4) }
+    100% { transform: translateY(-150em) scale(1) }
+  }
+
   div {
     font-size: 3px;
     transform: scale(var(--em));
@@ -81,7 +92,7 @@ header {
       color: #944;
     }
 
-    p {
+    >p {
       margin-left: 2.5px;
     }
 
@@ -90,6 +101,9 @@ header {
       font-family: inherit;
       transform: skewX(-8deg);
       height: 38px;
+      p { margin: 0 }
+      .l1 { transform: skewX(4deg) }
+      .l0 { transform: skewX(8deg) }
     }
   }
 }

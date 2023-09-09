@@ -47,7 +47,7 @@ const startMsg = [
 ]
 async function writeStartLine(delay) {
   console.log('Writing start line at', Date.now()%60_000/1000)
-  $('header pre').innerHTML += startMsg.shift() + '\n'
+  const el = mkEl('p', { txt: startMsg.shift(), class: 'l'+startMsg.length }, $('header pre'))
   return new Promise(res => setTimeout(res, delay))
 }
 
@@ -57,6 +57,7 @@ function mkEl(tag, attrs, parent) {
   const NS = tag==='svg' ? 'http://www.w3.org/2000/svg' : 'http://www.w3.org/1999/xhtml'
   const el = doc.createElementNS(NS, tag)
   Object.entries(attrs).forEach(([att, val]) => el.setAttribute(att, val))
+  el.innerText = attrs.txt || ''
   if (parent) parent.appendChild(el)
   return el
 }
@@ -97,6 +98,7 @@ async function init() {
     await mkCoinTextures()
     createPieces()
     console.log(`Builded! ${((Date.now()-start)/1000).toFixed(2)} secs.`)
+    $('header').className = 'hide'
   } catch(err) {
     console.log('Fail to build game assets.', err)
     alert(`Fail to build game assets.\n\n${err.message}\n\nTry to reload.`)
@@ -165,13 +167,13 @@ async function mkCoinTextures() {
         newPix[idx+2] = 200*pow(b, 4)
         let i = ~~(idx/5)
         if (pRnd(i) < .2) {
-          newPix[idx+0] = 55 + 140*r + pRnd(i+1,60)
+          newPix[idx+0] = (55 + 140*r + pRnd(i+1,60)) * (player ? .9 : 1)
           newPix[idx+1] = newPix[idx] * (
             g>.6 ? 1 : .6 + pow(pRnd(i+3,.4), 1.5)
           )
           newPix[idx+2] = pRnd(i+4,100) * b
         }
-        if (player) newPix[idx] = newPix[idx+1] = newPix[idx+2] = newPix[idx] * .8
+        if (player) newPix[idx] = newPix[idx+1] = newPix[idx+2] = pow(newPix[idx]/240, 1.4)*255
       }
     }
 
