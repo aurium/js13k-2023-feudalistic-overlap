@@ -270,6 +270,7 @@ function createPieces() {
       mkEl('i', {}, el)
       el.player = player
       el.roleIdx = i
+      el.dataset.name = name
       pieces[player][i] = el
       el.style.setProperty('--idx', i)
       el.style.setProperty('--pos', 1 - pow( 1 - i/8, 1.1))
