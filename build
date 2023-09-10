@@ -5,9 +5,9 @@ mkdir dist
 
 terser --compress \
        --mangle toplevel \
-       --output dist/game.min.js \
-       --source-map includeSources,url=game.min.js.map \
-       game.js
+       --output dist/app.min.js \
+       --source-map includeSources,url=app.min.js.map \
+       app.js
 
 cat index.html |
 while read line; do
@@ -19,8 +19,8 @@ while read line; do
   elif (echo "$line" | grep -q '<script.*</script>'); then
     echo ">> Building JS..." >&2
     echo '<script type="module">'
-    cat dist/game.min.js
-    echo '</script>'
+    cat dist/app.min.js
+    echo -e '\n//# sourceURL=app.min.js</script>'
   elif (echo "$line" | grep -q '</body>'); then
     echo ">> Embedding SVG..." >&2
     #./minify-svg pieces.3.svg
@@ -33,7 +33,7 @@ done > dist/index.html
 
 du -h dist/index.html
 
-rm dist/game.min.js
+rm dist/app.min.js
 
 echo ">> Packing..." >&2
 

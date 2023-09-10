@@ -62,6 +62,12 @@ function mkEl(tag, attrs, parent) {
   return el
 }
 
+// Create places:
+for (let y=0; y<3; y++) for (let x=0; x<3; x++) {
+  mkEl('p', { style: `--x:${x}; --y:${y}` }, $('#places'))
+}
+
+
 const canvas = mkEl('canvas', { width: 2400, height: 2400 })
 const ctx = canvas.getContext('2d')
 
