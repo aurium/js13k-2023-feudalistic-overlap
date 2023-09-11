@@ -22,7 +22,7 @@ const { PI, sin, cos, abs, min, pow, random } = Math
 const turn = 2*PI
 const coinBGs = []
 const $ = (sel)=> doc.querySelector(sel)
-const pieceNames = {
+const pieceNames = { // TODO: reverse it!
   pop: 'Pope',
   kin: 'King',
   bis: 'Bishop',
@@ -63,8 +63,12 @@ function mkEl(tag, attrs, parent) {
 }
 
 // Create places:
+const places = [[],[],[]]
 for (let y=0; y<3; y++) for (let x=0; x<3; x++) {
-  mkEl('p', { style: `--x:${x}; --y:${y}` }, $('#places'))
+  let place = mkEl('p', { style: `--x:${x}; --y:${y}` }, $('#places'))
+  place.addEventListener('mouseenter', ()=> enterPlace(x, y))
+  place.addEventListener('mouseleave', ()=> leavePlace(x, y))
+  places[y][x] = place
 }
 
 
@@ -263,28 +267,30 @@ function contrast(data, xLeft, yTop, w, h, mult) {
 function createPieces() {
   for (let player=0; player<2; player++) {
     Object.entries(pieceNames).forEach(([code, name], i) => {
-      console.log('Building '+name)
+      console.log(`Building ${player ? 'silver' : 'gold'} `+name)
       // <div class="coin pop"><b></b><i></i></div>
       const el = mkEl('div', { class: `coin ${code} player-${player}` }, table)
       mkEl('b', {}, el)
       mkEl('i', {}, el)
       el.player = player
-      el.roleIdx = i
+      el.roleIdx = 9 - i // TODO: make it 0..8 after reverse the pieceNames
       el.dataset.name = name
       pieces[player][i] = el
-      el.style.setProperty('--idx', i)
+      //el.style.setProperty('--idx', el.roleIdx)
       el.style.setProperty('--pos', 1 - pow( 1 - i/8, 1.1))
       el.addEventListener('mouseenter', ()=> mouseIn(el))
       el.addEventListener('mouseleave', ()=> mouseOut(el))
+      el.addEventListener('mousedown', grabCoin)
       setTimeout(()=> el.classList.add('created'), 500+1000*i)
-      setTimeout(()=> el.style.pointerEvents = 'all', 2000+1000*i)
+      setTimeout(()=> el.classList.add('waiting'), 2000+1000*i)
     })
   }
 }
 
 function mouseIn(coin) {
+  if (!coin.classList.contains('waiting')) return;
   for (let i=-1; i<=2; i++) {
-    let neighbor = pieces[coin.player][coin.roleIdx+i]
+    let neighbor = pieces[coin.player][(9-coin.roleIdx)+i]
     if (i!==0 && neighbor && !neighbor.placed) {
       neighbor.classList.add(`mv-${i<0 ? 'pre' : 'pos'}-${abs(i)}`)
     }
@@ -292,10 +298,12 @@ function mouseIn(coin) {
 }
 
 function mouseOut(coin) {
-  for (let i=-2; i<=2; i++) {
-    let neighbor = pieces[coin.player][coin.roleIdx+i]
-    if (i!==0 && neighbor) {
-      neighbor.classList.remove('mv-pre-1', 'mv-pos-1', 'mv-pos-2')
-    }
+  for (let i=0; i<9; i++) {
+    let neighbor = pieces[coin.player][i]
+    neighbor.classList.remove('mv-pre-1', 'mv-pos-1', 'mv-pos-2')
   }
+}
+
+function tts(text) {
+  console.log('TTS: '+text)
 }

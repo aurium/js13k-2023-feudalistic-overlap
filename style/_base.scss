@@ -3,6 +3,11 @@
   font-size: min(1vw, 1dvh);
 }
 
+* {
+  user-drag: none;
+  user-select: none;
+}
+
 body {
   margin: 0;
   padding: 0;
@@ -52,7 +57,7 @@ header {
     drop-shadow(1em 1em 2em rgba(0,0,0,.8));
 
   &.hide {
-    transform: translateY(-150em) scale(1);
+    transform: translateY(-150em) scale(0);
     animation: 1.5s ease-in hide-header;
   }
 
