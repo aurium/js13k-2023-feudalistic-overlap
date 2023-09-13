@@ -17,10 +17,11 @@ s/ (xmlns|sodipodi|inkscape):[a-z0-9]+="[^"]+"//g;
 s/xlink://g;
 s/<defs[^>]*>/<defs>/g;
 s/<\/?(xmlns|sodipodi|inkscape)[^>]*>//g;
-s/("|;)(stroke-dasharray|stroke-opacity|stroke-linejoin|fill-opacity|font[-a-z]*):[^;"]+;?/\1/g;
+s/("|;)(stroke-dasharray|stroke-dashoffset|stroke-opacity|stroke-linejoin|stroke-miterlimit|fill-opacity|font[-a-z]*):[^;"]+/\1/g;
+s/;+/;/g;
 s/;"/"/g;
-//s/style="[^"]*(fill:....)[^"]*(;stroke-width:....)[^"]*(;stroke:....)[^"]*"/style="\1\2"/g;
-//s/ id="[^_][^"]*"//g;
+#s/style="[^"]*(fill:....)[^"]*(;stroke-width:....)[^"]*(;stroke:....)[^"]*"/style="\1\2"/g;
+#s/ id="[^_][^"]*"//g;
 s/ +/ /g;
 s/> </></g;
 s/ ([-a-z]+=")/\n\1/ig;
@@ -42,3 +43,5 @@ echo -n '</style>' >> $tmpStyle
 sed -i "s!<defs>!<defs>$(cat $tmpStyle)!" $tmpSVG
 
 cat $tmpSVG
+# while read line; do echo -n $line' '; done |
+# sed 's/ >/>/g'

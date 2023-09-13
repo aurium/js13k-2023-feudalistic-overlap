@@ -3,11 +3,14 @@
 test -e dist && rm -r dist || true
 mkdir dist
 
+test x$NO_LOG = x1 && LOG_FN=void || LOG_FN=log
+
+cat app.js tts.js game.js |
+sed -r "s/\blog\(/$LOG_FN(/g" |
 terser --compress \
        --mangle toplevel \
        --output dist/app.min.js \
        --source-map includeSources,url=app.min.js.map \
-       app.js game.js
 
 cat index.html |
 while read line; do
@@ -19,8 +22,10 @@ while read line; do
   elif (echo "$line" | grep -q '<script.*</script>'); then
     echo ">> Building JS..." >&2
     echo '<script type="module">'
-    cat dist/app.min.js
-    echo -e '\n//# sourceURL=app.min.js</script>'
+    egrep -v '^//#' dist/app.min.js
+    #cat dist/app.min.js | sed 's/;/;\n/g'
+    #echo -e '\n//# sourceURL=app.min.js</script>'
+    echo -e '</script>'
   elif (echo "$line" | grep -q '</body>'); then
     echo ">> Embedding SVG..." >&2
     #./minify-svg pieces.3.svg

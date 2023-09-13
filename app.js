@@ -1,19 +1,3 @@
-console.log(`
-Roles:
-
-Pope https://en.wikipedia.org/wiki/Papal_regalia_and_insignia (Saint Peter's Keys)
-King https://commons.wikimedia.org/wiki/File:Picture_of_Queen_Ediva_in_Canterbury_Cathedral_(detail).png
-Bishop
-
-Noble
-Priest
-Knight
-
-Bourgeois
-Servant
-Peasant
-`)
-
 const doc = document
 const body = doc.body
 const hiGraphics = !doc.location.search.match(/[?&]low(=|$)/)
@@ -21,7 +5,9 @@ const start = Date.now()
 const { PI, sin, cos, abs, min, pow, random } = Math
 const turn = 2*PI
 const coinBGs = []
+const log = console.log
 const $ = (sel)=> doc.querySelector(sel)
+const $$ = (sel)=> [...doc.querySelectorAll(sel)]
 const pieceNames = { // TODO: reverse it!
   pop: 'Pope',
   kin: 'King',
@@ -46,7 +32,7 @@ const startMsg = [
   '            Tic-Tac-Toe.'
 ]
 async function writeStartLine(delay) {
-  console.log('Writing start line at', Date.now()%60_000/1000)
+  log('Writing start line at', Date.now()%60_000/1000)
   const el = mkEl('p', { txt: startMsg.shift(), class: 'l'+startMsg.length }, $('header pre'))
   return new Promise(res => setTimeout(res, delay))
 }
@@ -66,8 +52,11 @@ function mkEl(tag, attrs, parent) {
 const places = [[],[],[]]
 for (let y=0; y<3; y++) for (let x=0; x<3; x++) {
   let place = mkEl('p', { style: `--x:${x}; --y:${y}` }, $('#places'))
-  place.addEventListener('mouseenter', ()=> enterPlace(x, y))
-  place.addEventListener('mouseleave', ()=> leavePlace(x, y))
+  place.place = 1
+  place.x = x
+  place.y = y
+  // place.addEventListener('pointerenter', ()=> enterPlace(x, y))
+  // place.addEventListener('pointerleave', ()=> leavePlace(x, y))
   places[y][x] = place
 }
 
@@ -84,7 +73,7 @@ const svgToDataURL = (id)=>
     .replace(/\s+/g, '%20')
     .replace(/#/g, '%23')
 
-console.log('Loading SVGs...')
+log('Loading SVGs...')
 
 //const imgCoinBW = new Image()
 const imgCoinGray = new Image()
@@ -95,7 +84,7 @@ const imgCoinGray = new Image()
 
 // function loadCoinGray() {
   imgCoinGray.onload = init
-  imgCoinGray.onerror = initError
+  imgCoinGray.onerror = ()=> alert('Fail to init texture!')
   imgCoinGray.src = svgToDataURL('#pieces-4')
 // }
 
@@ -103,14 +92,14 @@ const getPos = (x, y)=> (1200*y + x) * 4
 
 async function init() {
   try {
-    console.log(`INIT Graphics ${hiGraphics ? 'High' : 'Low'}`, new Date(start))
+    log(`INIT Graphics ${hiGraphics ? 'High' : 'Low'}`, new Date(start))
     //await mkCoinIcons()
     await mkCoinTextures()
     createPieces()
-    console.log(`Builded! ${((Date.now()-start)/1000).toFixed(2)} secs.`)
+    log(`Builded! ${((Date.now()-start)/1000).toFixed(2)} secs.`)
     $('header').className = 'hide'
   } catch(err) {
-    console.log('Fail to build game assets.', err)
+    log('Fail to build game assets.', err)
     alert(`Fail to build game assets.\n\n${err.message}\n\nTry to reload.`)
   }
 }
@@ -233,10 +222,10 @@ function emboss(origPix, lightRevX) {
   return newPix
 }
 
-function initError(err) {
-  console.log('Fail to init:', err)
-  alert('Fail to init!\n\n'+err.message)
-}
+// function initError(err) {
+//   console.error('Fail to init:', err)
+//   alert('Fail to init!\n\n'+err.message)
+// }
 
 function drawCoinDots() {
   ctx.fillStyle = '#FFF'
@@ -267,43 +256,39 @@ function contrast(data, xLeft, yTop, w, h, mult) {
 function createPieces() {
   for (let player=0; player<2; player++) {
     Object.entries(pieceNames).forEach(([code, name], i) => {
-      console.log(`Building ${player ? 'silver' : 'gold'} `+name)
+      log(`Building ${player ? 'silver' : 'gold'} `+name)
       // <div class="coin pop"><b></b><i></i></div>
       const el = mkEl('div', { class: `coin ${code} player-${player}` }, table)
       mkEl('b', {}, el)
       mkEl('i', {}, el)
       el.player = player
-      el.roleIdx = 9 - i // TODO: make it 0..8 after reverse the pieceNames
+      el.roleIdx = 9-i // TODO: make it 0..8 after reverse the pieceNames
       el.dataset.name = name
-      pieces[player][i] = el
-      //el.style.setProperty('--idx', el.roleIdx)
+      pieces[player][el.roleIdx] = el
+      el.style.setProperty('--idx', el.roleIdx)
       el.style.setProperty('--pos', 1 - pow( 1 - i/8, 1.1))
-      el.addEventListener('mouseenter', ()=> mouseIn(el))
-      el.addEventListener('mouseleave', ()=> mouseOut(el))
-      el.addEventListener('mousedown', grabCoin)
+      el.addEventListener('pointerenter', ()=> mouseIn(el))
+      el.addEventListener('pointerleave', ()=> mouseOut(el))
+      el.addEventListener('pointerdown', grabCoin)
       setTimeout(()=> el.classList.add('created'), 500+1000*i)
-      setTimeout(()=> el.classList.add('waiting'), 2000+1000*i)
+      setTimeout(()=> el.classList.add('waiting'), 3000+1000*i)
     })
   }
 }
 
 function mouseIn(coin) {
   if (!coin.classList.contains('waiting')) return;
-  for (let i=-1; i<=2; i++) {
-    let neighbor = pieces[coin.player][(9-coin.roleIdx)+i]
+  for (let i=-2; i<2; i++) {
+    let neighbor = pieces[coin.player][(coin.roleIdx)+i]
     if (i!==0 && neighbor && !neighbor.placed) {
-      neighbor.classList.add(`mv-${i<0 ? 'pre' : 'pos'}-${abs(i)}`)
+      neighbor.classList.add(`mv-${i<0 ? 'pos' : 'pre'}-${abs(i)}`)
     }
   }
 }
 
 function mouseOut(coin) {
-  for (let i=0; i<9; i++) {
+  for (let i=1; i<=9; i++) {
     let neighbor = pieces[coin.player][i]
     neighbor.classList.remove('mv-pre-1', 'mv-pos-1', 'mv-pos-2')
   }
-}
-
-function tts(text) {
-  console.log('TTS: '+text)
 }

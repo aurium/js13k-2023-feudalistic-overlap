@@ -47,13 +47,13 @@
       top: -4.5em;
       width: 29em;
       height: 29em;
-      border-radius: 8em;
+      border-radius: 7em;
       background: var(--color);
       opacity: 0;
       transition: 1s ease-out;
       filter: blur(.5em);
     }
-    &:hover::before {
+    &.hover::before {
       opacity: 1;
       transition: .3s;
     }
